@@ -82,7 +82,7 @@ export default function App() {
     {
       lga: "Bende",
       name: "Ulochukwu Cave",
-      visual: require("./assets/placeholder-image.png"),
+      visual: require("./assets/uloc.jpg"),
       fact: "A divine wonder in Alayi, home to over 3,000 bats and a river flowing with both hot and cold water. Only the pure-hearted can enter without consequence.",
       didYouKnow:
         "The unique thermal properties of the river and the large bat population contribute to its mystique.",
