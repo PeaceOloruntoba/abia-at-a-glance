@@ -1,44 +1,262 @@
-import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Animated } from 'react-native';
+import { toast, Toaster } from 'sonner-native'; // Import Toaster
 
 export default function App() {
   const [currentLocationIndex, setCurrentLocationIndex] = useState(0);
   const [showDidYouKnow, setShowDidYouKnow] = useState(false);
-  const [timerActive, setTimerActive] = useState(false); // To track if the 15s timer is done
-  const [countdown, setCountdown] = useState(null); // Countdown value (5 to 0)
+  const [timerActive, setTimerActive] = useState(false);
+  const [countdown, setCountdown] = useState(null);
+  const [showHint, setShowHint] = useState(false);
+  const hintPosition = useState(new Animated.ValueXY({ x: 50, y: 50 }))[0];
 
-  const locations = [
-    {
-      image: require("./assets/placeholder-image.png"), // Replace with your actual image paths
-      fact: "Key fact about Location 1",
-      didYouKnow: "Bonus info about Location 1",
-    },
-    {
-      image: require("./assets/another-image.png"), // Replace with your actual image paths
-      fact: "Key fact about Location 2",
-      didYouKnow: "Bonus info about Location 2",
-    },
-    // Add more locations here
-  ];
+const locations = [
+  // Isuikwuato Local Government
+  {
+    lga: "Isuikwuato",
+    name: "Isi-Uzu Waterfall",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "A powerful site of spiritual cleansing, known for granting fertility and reversing misfortunes. Guns are forbidden, and no one is ever allowed to fall there.",
+    didYouKnow: "Locals believe in its spiritual power to cleanse and bless.",
+  },
+  {
+    lga: "Isuikwuato",
+    name: "Iyi Uhia",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "A stunning stream nestled between rocky plains, perfect for swimming and melon washing.",
+    didYouKnow:
+      "This stream is appreciated for its natural beauty and recreational use, without specific spiritual ties.",
+  },
+  {
+    lga: "Isuikwuato",
+    name: "Okpu Chukwu",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "A once-sacred cave believed to have housed Chukwu Okike Abiama before he departed for Arochukwu. Served as a wartime refuge.",
+    didYouKnow:
+      "Features seven openings and a vast central chamber. Some say a tiger now calls it home.",
+  },
+  {
+    lga: "Isuikwuato",
+    name: "Nne-Oche River",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "A sacred river where no indigene dares to eat its fish, but outsiders may. Fish can only be hunted if they leave the water.",
+    didYouKnow:
+      "This tradition highlights a unique relationship between the local people and the river.",
+  },
+
+  // Bende Local Government
+  {
+    lga: "Bende",
+    name: "Omenuko Building",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "Once a colonial office, this wooden structure served as a holding center for enslaved people before their transport to Arochukwu.",
+    didYouKnow:
+      "This site stands as a stark reminder of the transatlantic slave trade.",
+  },
+  {
+    lga: "Bende",
+    name: "The Armoury & Ulo Ishi Prison",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "More than just storage for colonial weapons, these sites witnessed brutal punishments of rebellious captives who were confined and flogged.",
+    didYouKnow:
+      "These locations echo with the pain and resilience of those who resisted colonial rule.",
+  },
+  {
+    lga: "Bende",
+    name: "Ulochukwu Cave",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "A divine wonder in Alayi, home to over 3,000 bats and a river flowing with both hot and cold water. Only the pure-hearted can enter without consequence.",
+    didYouKnow:
+      "The unique thermal properties of the river and the large bat population contribute to its mystique.",
+  },
+  {
+    lga: "Bende",
+    name: "The Sacred Oba Tree of Ukwueke",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "A powerful symbol of justice, untouched by outsiders. It is believed that no true indigene of Ukwueke dies by accident.",
+    didYouKnow:
+      "This tree holds deep cultural significance and is revered by the local community.",
+  },
+  {
+    lga: "Bende",
+    name: "Ojukwu’s Bunker (Methodist College)",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "A hidden Civil War stronghold where General Ojukwu stored ammunition and strategized.",
+    didYouKnow:
+      "This bunker serves as a historical landmark of the Nigerian Civil War.",
+  },
+  {
+    lga: "Bende",
+    name: "Akoli Imenyi",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "A tranquil escape into nature, with rustic palm-frond lodges, a natural fish pond, and a live turtle—a perfect retreat for serenity seekers.",
+    didYouKnow: "Offers a peaceful environment to connect with nature.",
+  },
+
+  // Ukwa East Local Government
+  {
+    lga: "Ukwa East",
+    name: "Azumili Blue River (Nne Obu)",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "Famous for its mesmerizing blue hue, which transforms into a vibrant green during the rainy season.",
+    didYouKnow: "A true marvel of nature showcasing seasonal color changes.",
+  },
+  {
+    lga: "Ukwa East",
+    name: "Obeka Blue River",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "Serves as a natural boundary between Abia State and Akwa Ibom, offering visitors a scenic and serene view.",
+    didYouKnow: "Its blue waters provide a picturesque natural border.",
+  },
+  {
+    lga: "Ukwa East",
+    name: "Owo Okoato Ohanbela",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "Home to a legendary mango tree where enslaved people once made their final wishes before being taken away. King Jaja of Opobo was also captured here.",
+    didYouKnow:
+      "This historic site bears witness to both the slave trade and the capture of a significant historical figure.",
+  },
+  {
+    lga: "Ukwa East",
+    name: "Akwete Beach",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "A hidden gem offering a breathtaking coastal experience with traditional thatch huts for relaxation.",
+    didYouKnow:
+      "Provides a tranquil coastal getaway with local architectural charm.",
+  },
+  {
+    lga: "Ukwa East",
+    name: "Akwete Weaving Institute",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "Unveils the intricate process of weaving the unique Akwete fabric, a proud symbol of Abia’s cultural heritage.",
+    didYouKnow:
+      "The craft empowers young girls in Akwete, preserving a centuries-old tradition.",
+  },
+
+  // Umuahia North Local Government
+  {
+    lga: "Umuahia North",
+    name: "Iyi Ama",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "A female river that diminished in size after the sacred crocodile dwelling within it was killed. Fishing is strictly prohibited.",
+    didYouKnow:
+      "Its source emerges from a stone, and it remains a revered site.",
+  },
+  {
+    lga: "Umuahia North",
+    name: "Iyi Ocha Umuagu",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "A sacred meeting point where three rivers from three different villages converge. Villagers sought refuge here during the war. Fishing is forbidden at their confluence.",
+    didYouKnow:
+      "While fishing is permitted in the individual rivers, the meeting point is considered sacred.",
+  },
+  {
+    lga: "Umuahia North",
+    name: "Iyi Umuchima",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "A breathtaking river deeply intertwined with the Ekpe tradition. Only inducted members are allowed near its waters during sacred rites.",
+    didYouKnow:
+      "Women and uninitiated men are strictly prohibited from approaching this site during these times.",
+  },
+  {
+    lga: "Umuahia North",
+    name: "Nwagbara Agomuo’s Compound",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "Tells the story of the first warrant chief in Ibeku, who played a significant role in the transatlantic slave trade. Home to the first storey building in Umuahia.",
+    didYouKnow:
+      "The first storey building was constructed by the British colonial government.",
+  },
+  {
+    lga: "Umuahia North",
+    name: "Ojukwu Bunker (Umuahia North)",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "An underground bunker built in just 90 days, serving as a safe haven for General Odumegwu Ojukwu after the fall of Enugu during the Nigerian Civil War.",
+    didYouKnow: "It had multiple exit routes, showcasing strategic planning.",
+  },
+  {
+    lga: "Umuahia North",
+    name: "National War Museum",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "Houses an extensive collection of ammunition and equipment used during the Nigeria-Biafra War.",
+    didYouKnow:
+      "One of the escape tunnels from Ojukwu’s bunker leads directly to the museum.",
+  },
+
+  // Ikwuano Local Government
+  {
+    lga: "Ikwuano",
+    name: "Ntugbo Oloko Magistrate and Customary Court",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "The first court built in the entire Southeast region, bearing witness to the Aba Women’s Riot of 1929 where brave women stood against colonial oppression.",
+    didYouKnow:
+      "Many of the women involved in the Aba Women’s Riot were tried here.",
+  },
+
+  // Umunneochie Local Government Area
+  {
+    lga: "Umunneochie",
+    name: "Iyi Aja in Umuobasi Mbala",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "A mysterious river filled with sand. It is not the water but the sand that sinks people and then throws them back up.",
+    didYouKnow: "This unusual phenomenon adds to the river's intrigue.",
+  },
+  {
+    lga: "Umunneochie",
+    name: "Nwokoro Ukwu (Giant of Alakuku) in Mbala Isiochi",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "The tallest man in Africa, standing at 11.6 feet tall. Born in the 1920s and passed in 1958.",
+    didYouKnow:
+      "He never married but left behind a star fruit tree in his compound, still thriving today. His grave in Okigwe is uniquely chained.",
+  },
+  {
+    lga: "Umunneochie",
+    name: "Nkoro Cave in Akporo Achara Isiochi",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "A breathtaking natural wonder discovered by Nnanyi Okorie, featuring a stunning passage of water.",
+    didYouKnow:
+      "The water passage inside the cave makes it a remarkable sight.",
+  },
+  {
+    lga: "Umunneochie",
+    name: "Iyi Okoro Aho in Amuda Isiochi",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "A waterfall discovered by ancient hunters in search of water. It has a separate spring water source that locals drink from to this day.",
+    didYouKnow: "The spring water source adds to its local significance.",
+  },
+  {
+    lga: "Umunneochie",
+    name: "Isi Imo in Umuako Isiochi",
+    visual: require("./assets/placeholder-image.png"),
+    fact: "Believed to be the origin of the Imo River. A three-day festival is held in its honor every February.",
+    didYouKnow: "The river is also renowned for its healing properties.",
+  },
+];
+
+  const currentLGA = locations[currentLocationIndex]?.lga || '';
+  const currentItemName = locations[currentLocationIndex]?.name || '';
+  const currentFact = locations[currentLocationIndex]?.fact || '';
+  const currentDidYouKnow = locations[currentLocationIndex]?.didYouKnow || '';
+  const currentVisual = locations[currentLocationIndex]?.visual;
 
   const goToPrevious = () => {
-    setCurrentLocationIndex((prevIndex) =>
-      prevIndex > 0 ? prevIndex - 1 : locations.length - 1
-    );
+    setCurrentLocationIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : locations.length - 1));
     setShowDidYouKnow(false);
-    setTimerActive(false); // Reset the 15s timer
-    setCountdown(null); // Reset the countdown
-    startInitialTimer(); // Start the 15s timer again
+    setTimerActive(false);
+    setCountdown(null);
+    startInitialTimer();
   };
 
   const goToNext = () => {
-    setCurrentLocationIndex((prevIndex) =>
-      prevIndex < locations.length - 1 ? prevIndex + 1 : 0
-    );
+    const nextIndex = (currentLocationIndex < locations.length - 1 ? currentLocationIndex + 1 : 0);
+    const nextLGA = locations[nextIndex]?.lga || '';
+    if (nextLGA !== currentLGA) {
+      toast.show(`Moving to ${nextLGA} LGA`, { type: 'success' });
+    }
+    setCurrentLocationIndex(nextIndex);
     setShowDidYouKnow(false);
-    setTimerActive(false); // Reset the 15s timer
-    setCountdown(null); // Reset the countdown
-    startInitialTimer(); // Start the 15s timer again
+    setTimerActive(false);
+    setCountdown(null);
+    startInitialTimer();
   };
 
   const handleDidYouKnowPress = () => {
@@ -54,7 +272,8 @@ export default function App() {
     setTimeout(() => {
       setTimerActive(false);
       startCountdown();
-    }, 15000); // 15000 milliseconds = 15 seconds
+      toast.show('Next in 5...', { type: 'info' });
+    }, 15000);
   };
 
   useEffect(() => {
@@ -63,6 +282,9 @@ export default function App() {
     if (countdown > 0) {
       timer = setTimeout(() => {
         setCountdown((prevCountdown) => prevCountdown - 1);
+        if (prevCountdown === 1) {
+          toast.show('Next in 1...', { type: 'info' });
+        }
       }, 1000);
     } else if (countdown === 0) {
       goToNext();
@@ -72,62 +294,82 @@ export default function App() {
   }, [countdown]);
 
   useEffect(() => {
-    startInitialTimer(); // Start the 15-second timer when the component mounts
+    startInitialTimer();
   }, []);
 
-  const currentLocation = locations[currentLocationIndex];
+  const handleHintPress = () => {
+    setShowHint(true);
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(hintPosition, { toValue: { x: 100, y: 150 }, duration: 1000, useNativeDriver: false }),
+        Animated.timing(hintPosition, { toValue: { x: 200, y: 250 }, duration: 1200, useNativeDriver: false }),
+        Animated.timing(hintPosition, { toValue: { x: 50, y: 300 }, duration: 900, useNativeDriver: false }),
+        Animated.timing(hintPosition, { toValue: { x: 150, y: 100 }, duration: 1100, useNativeDriver: false }),
+        Animated.timing(hintPosition, { toValue: { x: 50, y: 50 }, duration: 1000, useNativeDriver: false }),
+      ]),
+      { iterations: 3 }
+    ).start(() => setShowHint(false));
+  };
 
   return (
-    <View style={styles.container}>
-      {/* Image/Video Area */}
-      <View style={styles.mediaContainer}>
-        <Image
-          source={currentLocation.image}
-          style={styles.image}
-          resizeMode="contain"
-        />
-        {/* If you have video, you might use a <Video> component here */}
-      </View>
+    <>
+      <View style={styles.container}>
+        {/* Floating LGA Level */}
+        <View style={styles.lgaContainer}>
+          <Text style={styles.lgaText}>{currentLGA}</Text>
+        </View>
 
-      {/* Information Text */}
-      <View style={styles.infoContainer}>
-        <Text style={styles.factText}>{currentLocation.fact}</Text>
+        {/* Image/Video Area */}
+        <View style={styles.mediaContainer}>
+          {currentVisual && <Image source={currentVisual} style={styles.image} resizeMode="contain" />}
+        </View>
 
-        {/* "Did You Know?" Button */}
-        {!showDidYouKnow && currentLocation.didYouKnow && (
-          <TouchableOpacity
-            style={styles.didYouKnowButton}
-            onPress={handleDidYouKnowPress}
-          >
-            <Text style={styles.didYouKnowButtonText}>Did You Know?</Text>
+        {/* Information Text */}
+        <View style={styles.infoContainer}>
+          <Text style={styles.factText}>{currentFact}</Text>
+
+          {/* "Did You Know?" Button */}
+          {!showDidYouKnow && currentDidYouKnow && (
+            <TouchableOpacity style={styles.didYouKnowButton} onPress={handleDidYouKnowPress}>
+              <Text style={styles.didYouKnowButtonText}>Did You Know?</Text>
+            </TouchableOpacity>
+          )}
+
+          {/* "Did You Know?" Information */}
+          {showDidYouKnow && currentDidYouKnow && (
+            <View style={styles.didYouKnowContainer}>
+              <Text style={styles.didYouKnowText}>{currentDidYouKnow}</Text>
+            </View>
+          )}
+
+          {/* Countdown Timer */}
+          {countdown !== null && <Text style={styles.countdown}>{countdown}</Text>}
+        </View>
+
+        {/* Navigation Buttons */}
+        <View style={styles.navigationContainer}>
+          <TouchableOpacity style={styles.navButton} onPress={goToPrevious}>
+            <Text>Previous</Text>
           </TouchableOpacity>
-        )}
+          <TouchableOpacity style={styles.navButton} onPress={goToNext}>
+            <Text>Next</Text>
+          </TouchableOpacity>
+        </View>
 
-        {/* "Did You Know?" Information */}
-        {showDidYouKnow && currentLocation.didYouKnow && (
-          <View style={styles.didYouKnowContainer}>
-            <Text style={styles.didYouKnowText}>
-              {currentLocation.didYouKnow}
-            </Text>
-          </View>
-        )}
+        {/* Floating Hint Button */}
+        <TouchableOpacity style={styles.hintButton} onPress={handleHintPress}>
+          <Text style={styles.hintButtonText}>Hint</Text>
+        </TouchableOpacity>
 
-        {/* Countdown Timer */}
-        {countdown !== null && (
-          <Text style={styles.countdown}>{countdown}</Text>
+        {/* Animated Hint Text */}
+        {showHint && (
+          <Animated.View style={[hintPosition.getLayout(), styles.hintTextContainer]}>
+            <Text style={styles.hintText}>{currentFact}</Text>
+          </Animated.View>
         )}
       </View>
-
-      {/* Navigation Buttons */}
-      <View style={styles.navigationContainer}>
-        <TouchableOpacity style={styles.navButton} onPress={goToPrevious}>
-          <Text>Previous</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton} onPress={goToNext}>
-          <Text>Next</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+      <Toaster />
+    </>
   );
 }
 
@@ -135,9 +377,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f0f0f0",
-    alignItems: "center",
-    justifyContent: "space-around",
     padding: 20,
+  },
+  lgaContainer: {
+    position: "absolute",
+    top: 20,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+    paddingVertical: 10,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    zIndex: 10,
+  },
+  lgaText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
   },
   mediaContainer: {
     flex: 0.5,
@@ -185,6 +440,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: "100%",
     justifyContent: "space-around",
+    marginTop: 20,
   },
   navButton: {
     backgroundColor: "#ddd",
@@ -195,5 +451,34 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginTop: 10,
+  },
+  hintButton: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    backgroundColor: "#ffb347",
+    padding: 15,
+    borderRadius: 30,
+    elevation: 5,
+    zIndex: 10,
+  },
+  hintButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  hintTextContainer: {
+    position: "absolute",
+    top: 50, // Initial drop position
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    padding: 15,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    zIndex: 9,
+  },
+  hintText: {
+    fontSize: 16,
+    textAlign: "center",
   },
 });
