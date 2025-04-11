@@ -14,8 +14,22 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Video from "react-native-video"; // Import the video component
 
 export default function App() {
-  // ... your existing state variables ...
-  const [showQuitModal, setShowQuitModal] = useState(false); // State for quit confirmation modal
+  const [currentLocationIndex, setCurrentLocationIndex] = useState(0);
+  const [showDidYouKnow, setShowDidYouKnow] = useState(false);
+  const [timerActive, setTimerActive] = useState(false);
+  const [countdown, setCountdown] = useState(null);
+  const [showHint, setShowHint] = useState(false);
+  const hintPosition = useRef(new Animated.ValueXY({ x: 50, y: 50 })).current;
+  const [showQuestionModal, setShowQuestionModal] = useState(false);
+  const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [score, setScore] = useState(0);
+  const questionTimeout = useRef(null);
+  const lgaLevels = ["Level 🌟", "Level 🏞️", "Level 🗺️", "Level 📍"];
+  const [lgaLevelIndex, setLgaLevelIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [gameEnded, setGameEnded] = useState(false);
+  const [locationsVisited, setLocationsVisited] = useState(0);
+  const [showQuitModal, setShowQuitModal] = useState(false);  
 
   const locations = [
     // Your full locations data will go here
