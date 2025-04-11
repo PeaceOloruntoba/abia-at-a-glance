@@ -143,7 +143,7 @@ export default function App() {
     {
       lga: "Ukwa East",
       name: "Akwete Weaving Institute",
-      visual: require("./assets/placeholder-image.png"),
+      visual: require("./assets/akwete.jpg"),
       fact: "Unveils the intricate process of weaving the unique Akwete fabric, a proud symbol of Abia’s cultural heritage.",
       didYouKnow:
         "The craft empowers young girls in Akwete, preserving a centuries-old tradition.",
