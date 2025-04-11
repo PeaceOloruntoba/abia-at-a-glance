@@ -58,7 +58,7 @@ export default function App() {
     {
       lga: "Isuikwuato",
       name: "Nne-Oche River",
-      visual: require("./assets/placeholder-image.png"),
+      visual: require("./assets/nneoche.jpg"),
       fact: "A sacred river where no indigene dares to eat its fish, but outsiders may. Fish can only be hunted if they leave the water.",
       didYouKnow:
         "This tradition highlights a unique relationship between the local people and the river.",
