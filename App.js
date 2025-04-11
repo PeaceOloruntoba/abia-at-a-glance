@@ -261,7 +261,207 @@ export default function App() {
     setLgaLevelIndex(nextIndex);
   }, [currentLGA]);
 
-  // ... your existing functions ...
+  const generateQuestion = () => {
+    const possibleQuestions = [
+      `What Local Government Area is ${currentItemName} located in?`,
+      `According to the fact, what is a notable feature of ${currentItemName}?`,
+      currentDidYouKnow
+        ? `True or False: ${currentDidYouKnow}`
+        : `True or False: There's something interesting about ${currentItemName}.`,
+    ];
+    const randomIndex = Math.floor(Math.random() * possibleQuestions.length);
+    const question = possibleQuestions[randomIndex];
+
+    let correctAnswer;
+    let options;
+
+    if (question.includes("Local Government Area")) {
+      correctAnswer = currentLGA;
+      const otherLGAs = [...new Set(locations.map((loc) => loc.lga))].filter(
+        (lga) => lga !== currentLGA
+      );
+      const incorrectLGA1 =
+        otherLGAs[Math.floor(Math.random() * otherLGAs.length)] ||
+        "Unknown LGA";
+      const incorrectLGA2 =
+        otherLGAs.filter((lga) => lga !== incorrectLGA1)[
+          Math.floor(Math.random() * (otherLGAs.length - 1))
+        ] || "Another Unknown LGA";
+      options = [correctAnswer, incorrectLGA1, incorrectLGA2].sort(
+        () => Math.random() - 0.5
+      );
+    } else if (question.includes("notable feature")) {
+      correctAnswer = currentFact.split(".")[0];
+      const otherFacts = locations
+        .filter((loc) => loc.fact !== currentFact)
+        .map((loc) => loc.fact.split(".")[0]);
+      const incorrectFact1 =
+        otherFacts[Math.floor(Math.random() * otherFacts.length)] ||
+        "Interesting detail";
+      const incorrectFact2 =
+        otherFacts.filter((fact) => fact !== incorrectFact1)[
+          Math.floor(Math.random() * (otherFacts.length - 1))
+        ] || "Another detail";
+      options = [correctAnswer, incorrectFact1, incorrectFact2].sort(
+        () => Math.random() - 0.5
+      );
+    } else if (question.includes("True or False")) {
+      correctAnswer = currentDidYouKnow ? "True" : "True"; // Assuming 'Did You Know' is always true for the question
+      options = ["True", "False"].sort(() => Math.random() - 0.5);
+    }
+
+    return {
+      question,
+      options,
+      correctAnswer,
+    };
+  };
+
+  const goToPrevious = () => {
+    setCurrentLocationIndex((prevIndex) =>
+      prevIndex > 0 ? prevIndex - 1 : locations.length - 1
+    );
+    setShowDidYouKnow(false);
+    setTimerActive(false);
+    setCountdown(null);
+    startInitialTimer();
+    setShowQuestionModal(false);
+    clearTimeout(questionTimeout.current);
+  };
+
+  const goToNext = () => {
+    const nextIndex =
+      currentLocationIndex < locations.length - 1
+        ? currentLocationIndex + 1
+        : 0;
+    const nextLGA = locations[nextIndex]?.lga || "";
+    if (nextLGA !== currentLGA) {
+      toast.success(`Moving to ${nextLGA} LGA`, { type: "success" });
+    }
+    setCurrentLocationIndex(nextIndex);
+    setShowDidYouKnow(false);
+    setTimerActive(false);
+    setCountdown(null);
+    startInitialTimer();
+    setShowQuestionModal(false);
+    clearTimeout(questionTimeout.current);
+    setLocationsVisited((prevCount) => prevCount + 1);
+  };
+
+  const handleDidYouKnowPress = () => {
+    setShowDidYouKnow(true);
+  };
+
+  const startCountdown = () => {
+    setCountdown(5);
+  };
+
+  const startInitialTimer = () => {
+    setTimerActive(true);
+    setTimeout(() => {
+      setTimerActive(false);
+      startCountdown();
+      toast.info("Next in 5...", { type: "info" });
+    }, 20000);
+  };
+
+  useEffect(() => {
+    let timer;
+
+    if (countdown > 0) {
+      timer = setTimeout(() => {
+        setCountdown((prevCountdown) => {
+          if (prevCountdown === 1) {
+            toast.info("Next in 1...", { type: "info" });
+          }
+          return prevCountdown - 1;
+        });
+      }, 1000);
+    } else if (countdown === 0) {
+      goToNext();
+    }
+
+    return () => clearTimeout(timer);
+  }, [countdown]);
+
+  useEffect(() => {
+    startInitialTimer();
+  }, []);
+
+  useEffect(() => {
+    if (locationsVisited > totalLocations && totalLocations > 0) {
+      setGameEnded(true);
+    }
+  }, [locationsVisited, totalLocations]);
+
+  const handleHintPress = () => {
+    setShowHint(true);
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(hintPosition, {
+          toValue: { x: 100, y: 150 },
+          duration: 1000,
+          useNativeDriver: false,
+        }),
+        Animated.timing(hintPosition, {
+          toValue: { x: 200, y: 250 },
+          duration: 1200,
+          useNativeDriver: false,
+        }),
+        Animated.timing(hintPosition, {
+          toValue: { x: 50, y: 300 },
+          duration: 900,
+          useNativeDriver: false,
+        }),
+        Animated.timing(hintPosition, {
+          toValue: { x: 150, y: 100 },
+          duration: 1100,
+          useNativeDriver: false,
+        }),
+        Animated.timing(hintPosition, {
+          toValue: { x: 50, y: 50 },
+          duration: 1000,
+          useNativeDriver: false,
+        }),
+      ]),
+      { iterations: 3 }
+    ).start(() => {
+      setShowHint(false);
+      const question = generateQuestion();
+      setCurrentQuestion(question);
+      setShowQuestionModal(true);
+      startQuestionTimer();
+    });
+  };
+
+  const startQuestionTimer = () => {
+    clearTimeout(questionTimeout.current);
+    questionTimeout.current = setTimeout(() => {
+      setShowQuestionModal(false);
+      toast.error("Time's up!", { duration: 2000 });
+      goToNext(); // Move to the next item on timeout
+    }, 10000);
+  };
+
+  const handleAnswer = (selectedAnswer) => {
+    clearTimeout(questionTimeout.current);
+    setShowQuestionModal(false);
+    if (selectedAnswer === currentQuestion.correctAnswer) {
+      setScore((prevScore) => prevScore + 5);
+      toast.success("Correct! +5 points", { duration: 2000 });
+    } else {
+      setScore((prevScore) => prevScore - 2);
+      toast.error("Wrong! -2 points", { duration: 2000 });
+    }
+    goToNext();
+  };
+
+  const handleSkipQuestion = () => {
+    clearTimeout(questionTimeout.current);
+    setShowQuestionModal(false);
+    toast.warning("Skipped", { duration: 2000 });
+    goToNext();
+  };
 
   const handleQuit = () => {
     setShowQuitModal(true);
