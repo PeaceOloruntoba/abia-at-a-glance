@@ -11,245 +11,15 @@ import {
 import { toast, Toaster } from "sonner-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import Video from "react-native-video"; // Import the video component
 
 export default function App() {
-  const [currentLocationIndex, setCurrentLocationIndex] = useState(0);
-  const [showDidYouKnow, setShowDidYouKnow] = useState(false);
-  const [timerActive, setTimerActive] = useState(false);
-  const [countdown, setCountdown] = useState(null);
-  const [showHint, setShowHint] = useState(false);
-  const hintPosition = useRef(new Animated.ValueXY({ x: 50, y: 50 })).current;
-  const [showQuestionModal, setShowQuestionModal] = useState(false);
-  const [currentQuestion, setCurrentQuestion] = useState(null);
-  const [score, setScore] = useState(0);
-  const questionTimeout = useRef(null);
-  const lgaLevels = ["Level 🌟", "Level 🏞️", "Level 🗺️", "Level 📍"];
-  const [lgaLevelIndex, setLgaLevelIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [gameEnded, setGameEnded] = useState(false);
-  const [locationsVisited, setLocationsVisited] = useState(0);
+  // ... your existing state variables ...
+  const [showQuitModal, setShowQuitModal] = useState(false); // State for quit confirmation modal
 
-const locations = [
-  // Isuikwuato Local Government
-  {
-    lga: "Isuikwuato",
-    name: "Isi-Uzu Waterfall",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "A powerful site of spiritual cleansing, known for granting fertility and reversing misfortunes. Guns are forbidden, and no one is ever allowed to fall there.",
-    didYouKnow: "Locals believe in its spiritual power to cleanse and bless.",
-  },
-  {
-    lga: "Isuikwuato",
-    name: "Iyi Uhia",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "A stunning stream nestled between rocky plains, perfect for swimming and melon washing.",
-    didYouKnow:
-      "This stream is appreciated for its natural beauty and recreational use, without specific spiritual ties.",
-  },
-  {
-    lga: "Isuikwuato",
-    name: "Okpu Chukwu",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "A once-sacred cave believed to have housed Chukwu Okike Abiama before he departed for Arochukwu. Served as a wartime refuge.",
-    didYouKnow:
-      "Features seven openings and a vast central chamber. Some say a tiger now calls it home.",
-  },
-  {
-    lga: "Isuikwuato",
-    name: "Nne-Oche River",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "A sacred river where no indigene dares to eat its fish, but outsiders may. Fish can only be hunted if they leave the water.",
-    didYouKnow:
-      "This tradition highlights a unique relationship between the local people and the river.",
-  },
-
-  // Bende Local Government
-  {
-    lga: "Bende",
-    name: "Omenuko Building",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "Once a colonial office, this wooden structure served as a holding center for enslaved people before their transport to Arochukwu.",
-    didYouKnow:
-      "This site stands as a stark reminder of the transatlantic slave trade.",
-  },
-  {
-    lga: "Bende",
-    name: "The Armoury & Ulo Ishi Prison",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "More than just storage for colonial weapons, these sites witnessed brutal punishments of rebellious captives who were confined and flogged.",
-    didYouKnow:
-      "These locations echo with the pain and resilience of those who resisted colonial rule.",
-  },
-  {
-    lga: "Bende",
-    name: "Ulochukwu Cave",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "A divine wonder in Alayi, home to over 3,000 bats and a river flowing with both hot and cold water. Only the pure-hearted can enter without consequence.",
-    didYouKnow:
-      "The unique thermal properties of the river and the large bat population contribute to its mystique.",
-  },
-  {
-    lga: "Bende",
-    name: "The Sacred Oba Tree of Ukwueke",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "A powerful symbol of justice, untouched by outsiders. It is believed that no true indigene of Ukwueke dies by accident.",
-    didYouKnow:
-      "This tree holds deep cultural significance and is revered by the local community.",
-  },
-  {
-    lga: "Bende",
-    name: "Ojukwu’s Bunker (Methodist College)",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "A hidden Civil War stronghold where General Ojukwu stored ammunition and strategized.",
-    didYouKnow:
-      "This bunker serves as a historical landmark of the Nigerian Civil War.",
-  },
-  {
-    lga: "Bende",
-    name: "Akoli Imenyi",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "A tranquil escape into nature, with rustic palm-frond lodges, a natural fish pond, and a live turtle—a perfect retreat for serenity seekers.",
-    didYouKnow: "Offers a peaceful environment to connect with nature.",
-  },
-
-  // Ukwa East Local Government
-  {
-    lga: "Ukwa East",
-    name: "Azumili Blue River (Nne Obu)",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "Famous for its mesmerizing blue hue, which transforms into a vibrant green during the rainy season.",
-    didYouKnow: "A true marvel of nature showcasing seasonal color changes.",
-  },
-  {
-    lga: "Ukwa East",
-    name: "Obeka Blue River",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "Serves as a natural boundary between Abia State and Akwa Ibom, offering visitors a scenic and serene view.",
-    didYouKnow: "Its blue waters provide a picturesque natural border.",
-  },
-  {
-    lga: "Ukwa East",
-    name: "Owo Okoato Ohanbela",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "Home to a legendary mango tree where enslaved people once made their final wishes before being taken away. King Jaja of Opobo was also captured here.",
-    didYouKnow:
-      "This historic site bears witness to both the slave trade and the capture of a significant historical figure.",
-  },
-  {
-    lga: "Ukwa East",
-    name: "Akwete Beach",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "A hidden gem offering a breathtaking coastal experience with traditional thatch huts for relaxation.",
-    didYouKnow:
-      "Provides a tranquil coastal getaway with local architectural charm.",
-  },
-  {
-    lga: "Ukwa East",
-    name: "Akwete Weaving Institute",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "Unveils the intricate process of weaving the unique Akwete fabric, a proud symbol of Abia’s cultural heritage.",
-    didYouKnow:
-      "The craft empowers young girls in Akwete, preserving a centuries-old tradition.",
-  },
-
-  // Umuahia North Local Government
-  {
-    lga: "Umuahia North",
-    name: "Iyi Ama",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "A female river that diminished in size after the sacred crocodile dwelling within it was killed. Fishing is strictly prohibited.",
-    didYouKnow:
-      "Its source emerges from a stone, and it remains a revered site.",
-  },
-  {
-    lga: "Umuahia North",
-    name: "Iyi Ocha Umuagu",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "A sacred meeting point where three rivers from three different villages converge. Villagers sought refuge here during the war. Fishing is forbidden at their confluence.",
-    didYouKnow:
-      "While fishing is permitted in the individual rivers, the meeting point is considered sacred.",
-  },
-  {
-    lga: "Umuahia North",
-    name: "Iyi Umuchima",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "A breathtaking river deeply intertwined with the Ekpe tradition. Only inducted members are allowed near its waters during sacred rites.",
-    didYouKnow:
-      "Women and uninitiated men are strictly prohibited from approaching this site during these times.",
-  },
-  {
-    lga: "Umuahia North",
-    name: "Nwagbara Agomuo’s Compound",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "Tells the story of the first warrant chief in Ibeku, who played a significant role in the transatlantic slave trade. Home to the first storey building in Umuahia.",
-    didYouKnow:
-      "The first storey building was constructed by the British colonial government.",
-  },
-  {
-    lga: "Umuahia North",
-    name: "Ojukwu Bunker (Umuahia North)",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "An underground bunker built in just 90 days, serving as a safe haven for General Odumegwu Ojukwu after the fall of Enugu during the Nigerian Civil War.",
-    didYouKnow: "It had multiple exit routes, showcasing strategic planning.",
-  },
-  {
-    lga: "Umuahia North",
-    name: "National War Museum",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "Houses an extensive collection of ammunition and equipment used during the Nigeria-Biafra War.",
-    didYouKnow:
-      "One of the escape tunnels from Ojukwu’s bunker leads directly to the museum.",
-  },
-
-  // Ikwuano Local Government
-  {
-    lga: "Ikwuano",
-    name: "Ntugbo Oloko Magistrate and Customary Court",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "The first court built in the entire Southeast region, bearing witness to the Aba Women’s Riot of 1929 where brave women stood against colonial oppression.",
-    didYouKnow:
-      "Many of the women involved in the Aba Women’s Riot were tried here.",
-  },
-
-  // Umunneochie Local Government Area
-  {
-    lga: "Umunneochie",
-    name: "Iyi Aja in Umuobasi Mbala",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "A mysterious river filled with sand. It is not the water but the sand that sinks people and then throws them back up.",
-    didYouKnow: "This unusual phenomenon adds to the river's intrigue.",
-  },
-  {
-    lga: "Umunneochie",
-    name: "Nwokoro Ukwu (Giant of Alakuku) in Mbala Isiochi",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "The tallest man in Africa, standing at 11.6 feet tall. Born in the 1920s and passed in 1958.",
-    didYouKnow:
-      "He never married but left behind a star fruit tree in his compound, still thriving today. His grave in Okigwe is uniquely chained.",
-  },
-  {
-    lga: "Umunneochie",
-    name: "Nkoro Cave in Akporo Achara Isiochi",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "A breathtaking natural wonder discovered by Nnanyi Okorie, featuring a stunning passage of water.",
-    didYouKnow:
-      "The water passage inside the cave makes it a remarkable sight.",
-  },
-  {
-    lga: "Umunneochie",
-    name: "Iyi Okoro Aho in Amuda Isiochi",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "A waterfall discovered by ancient hunters in search of water. It has a separate spring water source that locals drink from to this day.",
-    didYouKnow: "The spring water source adds to its local significance.",
-  },
-  {
-    lga: "Umunneochie",
-    name: "Isi Imo in Umuako Isiochi",
-    visual: require("./assets/placeholder-image.png"),
-    fact: "Believed to be the origin of the Imo River. A three-day festival is held in its honor every February.",
-    didYouKnow: "The river is also renowned for its healing properties.",
-  },
-];
+  const locations = [
+    // Your full locations data will go here
+  ];
 
   const totalLocations = locations.length;
   const currentLGA = locations[currentLocationIndex]?.lga || "";
@@ -262,7 +32,7 @@ const locations = [
   useEffect(() => {
     setTimeout(() => {
       setIsLoading(false);
-    }, 3000); // Simulate 3 seconds of loading
+    }, 5000); // Increased loading time for video to potentially load
   }, []);
 
   useEffect(() => {
@@ -270,213 +40,76 @@ const locations = [
     setLgaLevelIndex(nextIndex);
   }, [currentLGA]);
 
-  const generateQuestion = () => {
-    const possibleQuestions = [
-      `What Local Government Area is ${currentItemName} located in?`,
-      `According to the fact, what is a notable feature of ${currentItemName}?`,
-      currentDidYouKnow ? `True or False: ${currentDidYouKnow}` : `True or False: There's something interesting about ${currentItemName}.`,
-    ];
-    const randomIndex = Math.floor(Math.random() * possibleQuestions.length);
-    const question = possibleQuestions[randomIndex];
+  // ... your existing functions ...
 
-    let correctAnswer;
-    let options;
-
-    if (question.includes("Local Government Area")) {
-      correctAnswer = currentLGA;
-      const otherLGAs = [...new Set(locations.map((loc) => loc.lga))].filter(
-        (lga) => lga !== currentLGA
-      );
-      const incorrectLGA1 = otherLGAs[Math.floor(Math.random() * otherLGAs.length)] || "Unknown LGA";
-      const incorrectLGA2 = otherLGAs.filter(lga => lga !== incorrectLGA1)[Math.floor(Math.random() * (otherLGAs.length - 1))] || "Another Unknown LGA";
-      options = [correctAnswer, incorrectLGA1, incorrectLGA2].sort(() => Math.random() - 0.5);
-    } else if (question.includes("notable feature")) {
-      correctAnswer = currentFact.split(".")[0];
-      const otherFacts = locations
-        .filter((loc) => loc.fact !== currentFact)
-        .map((loc) => loc.fact.split(".")[0]);
-      const incorrectFact1 = otherFacts[Math.floor(Math.random() * otherFacts.length)] || "Interesting detail";
-      const incorrectFact2 = otherFacts.filter(fact => fact !== incorrectFact1)[Math.floor(Math.random() * (otherFacts.length - 1))] || "Another detail";
-      options = [correctAnswer, incorrectFact1, incorrectFact2].sort(() => Math.random() - 0.5);
-    } else if (question.includes("True or False")) {
-      correctAnswer = currentDidYouKnow ? "True" : "True"; // Assuming 'Did You Know' is always true for the question
-      options = ["True", "False"].sort(() => Math.random() - 0.5);
-    }
-
-    return {
-      question,
-      options,
-      correctAnswer,
-    };
+  const handleQuit = () => {
+    setShowQuitModal(true);
   };
 
-  const goToPrevious = () => {
-    setCurrentLocationIndex((prevIndex) =>
-      prevIndex > 0 ? prevIndex - 1 : locations.length - 1
-    );
-    setShowDidYouKnow(false);
-    setTimerActive(false);
-    setCountdown(null);
-    startInitialTimer();
-    setShowQuestionModal(false);
-    clearTimeout(questionTimeout.current);
+  const confirmQuit = () => {
+    setShowQuitModal(false);
+    setGameEnded(true);
   };
 
-  const goToNext = () => {
-    const nextIndex =
-      currentLocationIndex < locations.length - 1 ? currentLocationIndex + 1 : 0;
-    const nextLGA = locations[nextIndex]?.lga || "";
-    if (nextLGA !== currentLGA) {
-      toast.success(`Moving to ${nextLGA} LGA`, { type: "success" });
-    }
-    setCurrentLocationIndex(nextIndex);
-    setShowDidYouKnow(false);
-    setTimerActive(false);
-    setCountdown(null);
-    startInitialTimer();
-    setShowQuestionModal(false);
-    clearTimeout(questionTimeout.current);
-    setLocationsVisited((prevCount) => prevCount + 1);
-  };
-
-  const handleDidYouKnowPress = () => {
-    setShowDidYouKnow(true);
-  };
-
-  const startCountdown = () => {
-    setCountdown(5);
-  };
-
-  const startInitialTimer = () => {
-    setTimerActive(true);
-    setTimeout(() => {
-      setTimerActive(false);
-      startCountdown();
-      toast.info("Next in 5...", { type: "info" });
-    }, 20000);
-  };
-
-  useEffect(() => {
-    let timer;
-
-    if (countdown > 0) {
-      timer = setTimeout(() => {
-        setCountdown((prevCountdown) => {
-          if (prevCountdown === 1) {
-            toast.info("Next in 1...", { type: "info" });
-          }
-          return prevCountdown - 1;
-        });
-      }, 1000);
-    } else if (countdown === 0) {
-      goToNext();
-    }
-
-    return () => clearTimeout(timer);
-  }, [countdown]);
-
-  useEffect(() => {
-    startInitialTimer();
-  }, []);
-
-  useEffect(() => {
-    if (locationsVisited > totalLocations && totalLocations > 0) {
-      setGameEnded(true);
-    }
-  }, [locationsVisited, totalLocations]);
-
-  const handleHintPress = () => {
-    setShowHint(true);
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(hintPosition, {
-          toValue: { x: 100, y: 150 },
-          duration: 1000,
-          useNativeDriver: false,
-        }),
-        Animated.timing(hintPosition, {
-          toValue: { x: 200, y: 250 },
-          duration: 1200,
-          useNativeDriver: false,
-        }),
-        Animated.timing(hintPosition, {
-          toValue: { x: 50, y: 300 },
-          duration: 900,
-          useNativeDriver: false,
-        }),
-        Animated.timing(hintPosition, {
-          toValue: { x: 150, y: 100 },
-          duration: 1100,
-          useNativeDriver: false,
-        }),
-        Animated.timing(hintPosition, {
-          toValue: { x: 50, y: 50 },
-          duration: 1000,
-          useNativeDriver: false,
-        }),
-      ]),
-      { iterations: 3 }
-    ).start(() => {
-      setShowHint(false);
-      const question = generateQuestion();
-      setCurrentQuestion(question);
-      setShowQuestionModal(true);
-      startQuestionTimer();
-    });
-  };
-
-  const startQuestionTimer = () => {
-    clearTimeout(questionTimeout.current);
-    questionTimeout.current = setTimeout(() => {
-      setShowQuestionModal(false);
-      toast.error("Time's up!", { duration: 2000 });
-      goToNext(); // Move to the next item on timeout
-    }, 10000);
-  };
-
-  const handleAnswer = (selectedAnswer) => {
-    clearTimeout(questionTimeout.current);
-    setShowQuestionModal(false);
-    if (selectedAnswer === currentQuestion.correctAnswer) {
-      setScore((prevScore) => prevScore + 5);
-      toast.success('Correct! +5 points', { duration: 2000 });
-    } else {
-      setScore((prevScore) => prevScore - 2);
-      toast.error('Wrong! -2 points', { duration: 2000 });
-    }
-    goToNext();
-  };
-
-  const handleSkipQuestion = () => {
-    clearTimeout(questionTimeout.current);
-    setShowQuestionModal(false);
-    toast.warning('Skipped', { duration: 2000 });
-    goToNext();
+  const cancelQuit = () => {
+    setShowQuitModal(false);
   };
 
   if (isLoading) {
     return (
-      <View style={styles.splashScreen}>
-        <Text style={styles.splashText}>Abia at a Glance 🌟</Text>
-        {/* You can add a loading indicator or image here */}
+      <View style={styles.fullScreen}>
+        <Video
+          source={require("./assets/splash_video.mp4")} // Replace with your video path
+          style={styles.fullScreen}
+          muted={true}
+          repeat={true}
+          resizeMode="cover"
+        />
+        <View style={styles.splashContent}>
+          <Text style={styles.splashTitle}>Abia at a Glance 🌟</Text>
+          <Text style={styles.instructionsTitle}>How to Play:</Text>
+          <Text style={styles.instructionsText}>
+            Explore fascinating locations in Abia State. {"\n"}
+            Tap 'Hint' for a fun fact and a quiz! {"\n"}
+            Answer correctly to earn points. {"\n"}
+            Use 'Previous' and 'Next' to navigate. {"\n"}
+            Have fun discovering Abia!
+          </Text>
+        </View>
       </View>
     );
   }
 
   if (gameEnded) {
     return (
-      <View style={styles.endScreen}>
-        <Text style={styles.endText}>Game Over! 🎉</Text>
-        <Text style={styles.finalScore}>Your Final Score: 🏆 {score}</Text>
-        <TouchableOpacity style={styles.restartButton} onPress={() => {
-          setGameEnded(false);
-          setLocationsVisited(0);
-          setCurrentLocationIndex(0);
-          setScore(0);
-          startInitialTimer();
-        }}>
-          <Text style={styles.restartButtonText}>Restart 🔄</Text>
-        </TouchableOpacity>
+      <View style={styles.fullScreen}>
+        <Video
+          source={require("./assets/end_video.mp4")} // Replace with your video path
+          style={styles.fullScreen}
+          muted={true}
+          repeat={true}
+          resizeMode="cover"
+        />
+        <View style={styles.endContent}>
+          <Text style={styles.endTitle}>That's all for now! 🎉</Text>
+          <Text style={styles.finalScore}>Your Final Score: 🏆 {score}</Text>
+          <Text style={styles.enticementText}>
+            Intrigued? These amazing sites are waiting for your visit! {"\n"}
+            Come and experience the beauty and history of Abia State firsthand.
+          </Text>
+          <TouchableOpacity
+            style={styles.restartButton}
+            onPress={() => {
+              setGameEnded(false);
+              setLocationsVisited(0);
+              setCurrentLocationIndex(0);
+              setScore(0);
+              startInitialTimer();
+            }}
+          >
+            <Text style={styles.restartButtonText}>Start Again 🔄</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -509,7 +142,8 @@ const locations = [
 
             {/* Animated Hint Text */}
             {showHint && (
-              <Animated.View style={[hintPosition.getLayout(), styles.hintTextContainer]}
+              <Animated.View
+                style={[hintPosition.getLayout(), styles.hintTextContainer]}
               >
                 <Text style={styles.hintText}>{currentFact}</Text>
               </Animated.View>
@@ -560,6 +194,11 @@ const locations = [
               <Text style={styles.hintButtonText}>Hint</Text>
             </TouchableOpacity>
 
+            {/* Quit Button */}
+            <TouchableOpacity style={styles.quitButton} onPress={handleQuit}>
+              <Text style={styles.quitButtonText}>Quit</Text>
+            </TouchableOpacity>
+
             {/* Question Modal */}
             <Modal
               visible={showQuestionModal}
@@ -574,7 +213,9 @@ const locations = [
                 <View style={styles.modalContainer}>
                   {currentQuestion && (
                     <>
-                      <Text style={styles.modalQuestion}>{currentQuestion.question}</Text>
+                      <Text style={styles.modalQuestion}>
+                        {currentQuestion.question}
+                      </Text>
                       {currentQuestion.options.map((option, index) => (
                         <TouchableOpacity
                           key={index}
@@ -595,6 +236,35 @@ const locations = [
                 </View>
               </View>
             </Modal>
+
+            {/* Quit Confirmation Modal */}
+            <Modal
+              visible={showQuitModal}
+              transparent={true}
+              animationType="fade"
+            >
+              <View style={styles.modalOverlay}>
+                <View style={styles.quitModalContainer}>
+                  <Text style={styles.quitModalText}>
+                    Are you sure you want to quit?
+                  </Text>
+                  <View style={styles.quitModalButtons}>
+                    <TouchableOpacity
+                      style={styles.confirmQuitButton}
+                      onPress={confirmQuit}
+                    >
+                      <Text style={styles.confirmQuitText}>Yes</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.cancelQuitButton}
+                      onPress={cancelQuit}
+                    >
+                      <Text style={styles.cancelQuitText}>No</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </Modal>
           </View>
           <Toaster />
         </SafeAreaProvider>
@@ -604,6 +274,67 @@ const locations = [
 }
 
 const styles = StyleSheet.create({
+  fullScreen: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+    position: "absolute",
+    top: 0,
+    left: 0,
+  },
+  splashContent: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 40,
+    backgroundColor: "rgba(0,0,0,0.5)", // Semi-transparent overlay for text
+  },
+  splashTitle: {
+    fontSize: 48,
+    fontWeight: "bold",
+    color: "white",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  instructionsTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "white",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  instructionsText: {
+    fontSize: 18,
+    color: "white",
+    textAlign: "center",
+    lineHeight: 24,
+  },
+  endContent: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 40,
+    backgroundColor: "rgba(0,0,0,0.6)", // Semi-transparent overlay
+  },
+  endTitle: {
+    fontSize: 40,
+    fontWeight: "bold",
+    color: "white",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  finalScore: {
+    fontSize: 28,
+    color: "white",
+    marginBottom: 30,
+  },
+  enticementText: {
+    fontSize: 20,
+    color: "white",
+    textAlign: "center",
+    marginBottom: 40,
+    lineHeight: 26,
+  },
   container: {
     flex: 1,
     backgroundColor: "#f0f0f0",
@@ -667,22 +398,22 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   navigationContainer: {
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "space-around",
     marginTop: 20,
     paddingHorizontal: 20,
   },
   navButton: {
-    backgroundColor: '#64b5f6', // A light blue
+    backgroundColor: "#64b5f6", // A light blue
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 8,
     elevation: 3, // Add a slight shadow
   },
   navButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
     fontSize: 16,
   },
   countdown: {
@@ -706,17 +437,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   hintTextContainer: {
-    position: 'absolute',
-    top: '50%', // Center vertically
-    left: '10%',
-    right: '10%',
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    position: "absolute",
+    top: "50%", // Center vertically
+    left: "10%",
+    right: "10%",
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
     padding: 15,
     borderRadius: 5,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     zIndex: 9,
-    alignItems: 'center', // Center text horizontally
+    alignItems: "center", // Center text horizontally
   },
   hintText: {
     fontSize: 16,
@@ -764,58 +495,72 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   scoreContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 60, // Adjust as needed
     right: 20,
-    backgroundColor: 'rgba(0, 128, 0, 0.7)',
+    backgroundColor: "rgba(0, 128, 0, 0.7)",
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 8,
     zIndex: 11,
   },
   scoreText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
     fontSize: 16,
   },
-  splashScreen: {
-    flex: 1,
-    backgroundColor: '#81c784', // A nice green
-    justifyContent: 'center',
-    alignItems: 'center',
+  quitButton: {
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    backgroundColor: "#f44336", // A red color
+    padding: 15,
+    borderRadius: 30,
+    elevation: 5,
+    zIndex: 10,
   },
-  splashText: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: 'white',
+  quitButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
   },
-  endScreen: {
-    flex: 1,
-    backgroundColor: '#fdd835', // A cheerful yellow
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  endText: {
-    fontSize: 40,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  finalScore: {
-    fontSize: 24,
-    color: '#333',
-    marginBottom: 30,
-  },
-  restartButton: {
-    backgroundColor: '#1e88e5', // A bright blue
-    paddingVertical: 15,
-    paddingHorizontal: 30,
+  quitModalContainer: {
+    backgroundColor: "white",
+    padding: 20,
     borderRadius: 10,
+    width: "80%",
+    alignItems: "center",
   },
-  restartButtonText: {
-    color: 'white',
-    fontSize: 20,
-    fontWeight: 'bold',
+  quitModalText: {
+    fontSize: 18,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  quitModalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "80%",
+  },
+  confirmQuitButton: {
+    backgroundColor: "#d32f2f",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  confirmQuitText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  cancelQuitButton: {
+    backgroundColor: "#4caf50",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  cancelQuitText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });
