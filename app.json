@@ -20,19 +20,20 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.peaceoloruntoba.abiaataglance"
+      "package": "com.peaceoloruntoba.abiaataglance",
+      "permissions": []
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "extra": {
-      "eas": {
-        "projectId": "d466911d-64d6-4787-bd25-dadbbf582df7"
-      }
-    },
     "plugins": [
       "react-native-video",
       "expo-video"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "d0ce7ad2-92a1-4579-aea8-06b276aedcf9"
+      }
+    }
   }
 }
