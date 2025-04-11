@@ -120,7 +120,7 @@ export default function App() {
     {
       lga: "Ukwa East",
       name: "Obeka Blue River",
-      visual: require("./assets/placeholder-image.png"),
+      visual: require("./assets/obeka.jpg"),
       fact: "Serves as a natural boundary between Abia State and Akwa Ibom, offering visitors a scenic and serene view.",
       didYouKnow: "Its blue waters provide a picturesque natural border.",
     },
