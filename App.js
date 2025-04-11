@@ -11,7 +11,7 @@ import {
 import { toast, Toaster } from "sonner-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { Video } from "expo-video";
+import { Video } from "expo-av";
 
 export default function App() {
   const [currentLocationIndex, setCurrentLocationIndex] = useState(0);
