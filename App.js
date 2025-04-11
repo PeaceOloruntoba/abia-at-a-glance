@@ -74,7 +74,7 @@ export default function App() {
     {
       lga: "Bende",
       name: "The Armoury & Ulo Ishi Prison",
-      visual: require("./assets/placeholder-image.png"),
+      visual: require("./assets/armor.jpg"),
       fact: "More than just storage for colonial weapons, these sites witnessed brutal punishments of rebellious captives who were confined and flogged.",
       didYouKnow:
         "These locations echo with the pain and resilience of those who resisted colonial rule.",
