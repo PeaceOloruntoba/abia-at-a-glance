@@ -23,6 +23,8 @@ export default function App() {
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [score, setScore] = useState(0);
   const questionTimeout = useRef(null);
+  const lgaLevels = ["Level 🌟", "Level 🏞️", "Level 🗺️", "Level 📍"];
+  const [lgaLevelIndex, setLgaLevelIndex] = useState(0);
 
 const locations = [
   // Isuikwuato Local Government
@@ -246,18 +248,25 @@ const locations = [
   },
 ];
 
-
   const currentLGA = locations[currentLocationIndex]?.lga || "";
   const currentItemName = locations[currentLocationIndex]?.name || "";
   const currentFact = locations[currentLocationIndex]?.fact || "";
   const currentDidYouKnow = locations[currentLocationIndex]?.didYouKnow || "";
   const currentVisual = locations[currentLocationIndex]?.visual;
+  const currentLGAWithLevel = `${lgaLevels[lgaLevelIndex]} - ${currentLGA}`;
+
+  useEffect(() => {
+    const nextIndex = (lgaLevelIndex + 1) % lgaLevels.length;
+    setLgaLevelIndex(nextIndex);
+  }, [currentLGA]);
 
   const generateQuestion = () => {
     const possibleQuestions = [
       `What Local Government Area is ${currentItemName} located in?`,
       `According to the fact, what is a notable feature of ${currentItemName}?`,
-      currentDidYouKnow ? `True or False: ${currentDidYouKnow}` : `True or False: There's something interesting about ${currentItemName}.`,
+      currentDidYouKnow
+        ? `True or False: ${currentDidYouKnow}`
+        : `True or False: There's something interesting about ${currentItemName}.`,
     ];
     const randomIndex = Math.floor(Math.random() * possibleQuestions.length);
     const question = possibleQuestions[randomIndex];
@@ -270,17 +279,31 @@ const locations = [
       const otherLGAs = [...new Set(locations.map((loc) => loc.lga))].filter(
         (lga) => lga !== currentLGA
       );
-      const incorrectLGA1 = otherLGAs[Math.floor(Math.random() * otherLGAs.length)] || "Unknown LGA";
-      const incorrectLGA2 = otherLGAs.filter(lga => lga !== incorrectLGA1)[Math.floor(Math.random() * (otherLGAs.length - 1))] || "Another Unknown LGA";
-      options = [correctAnswer, incorrectLGA1, incorrectLGA2].sort(() => Math.random() - 0.5);
+      const incorrectLGA1 =
+        otherLGAs[Math.floor(Math.random() * otherLGAs.length)] ||
+        "Unknown LGA";
+      const incorrectLGA2 =
+        otherLGAs.filter((lga) => lga !== incorrectLGA1)[
+          Math.floor(Math.random() * (otherLGAs.length - 1))
+        ] || "Another Unknown LGA";
+      options = [correctAnswer, incorrectLGA1, incorrectLGA2].sort(
+        () => Math.random() - 0.5
+      );
     } else if (question.includes("notable feature")) {
       correctAnswer = currentFact.split(".")[0];
       const otherFacts = locations
         .filter((loc) => loc.fact !== currentFact)
         .map((loc) => loc.fact.split(".")[0]);
-      const incorrectFact1 = otherFacts[Math.floor(Math.random() * otherFacts.length)] || "Interesting detail";
-      const incorrectFact2 = otherFacts.filter(fact => fact !== incorrectFact1)[Math.floor(Math.random() * (otherFacts.length - 1))] || "Another detail";
-      options = [correctAnswer, incorrectFact1, incorrectFact2].sort(() => Math.random() - 0.5);
+      const incorrectFact1 =
+        otherFacts[Math.floor(Math.random() * otherFacts.length)] ||
+        "Interesting detail";
+      const incorrectFact2 =
+        otherFacts.filter((fact) => fact !== incorrectFact1)[
+          Math.floor(Math.random() * (otherFacts.length - 1))
+        ] || "Another detail";
+      options = [correctAnswer, incorrectFact1, incorrectFact2].sort(
+        () => Math.random() - 0.5
+      );
     } else if (question.includes("True or False")) {
       correctAnswer = currentDidYouKnow ? "True" : "True"; // Assuming 'Did You Know' is always true for the question
       options = ["True", "False"].sort(() => Math.random() - 0.5);
@@ -307,7 +330,9 @@ const locations = [
 
   const goToNext = () => {
     const nextIndex =
-      currentLocationIndex < locations.length - 1 ? currentLocationIndex + 1 : 0;
+      currentLocationIndex < locations.length - 1
+        ? currentLocationIndex + 1
+        : 0;
     const nextLGA = locations[nextIndex]?.lga || "";
     if (nextLGA !== currentLGA) {
       toast.success(`Moving to ${nextLGA} LGA`, { type: "success" });
@@ -415,10 +440,10 @@ const locations = [
     setShowQuestionModal(false);
     if (selectedAnswer === currentQuestion.correctAnswer) {
       setScore((prevScore) => prevScore + 5);
-      toast.success('Correct! +5 points', { duration: 2000 });
+      toast.success("Correct! +5 points", { duration: 2000 });
     } else {
       setScore((prevScore) => prevScore - 2);
-      toast.error('Wrong! -2 points', { duration: 2000 });
+      toast.error("Wrong! -2 points", { duration: 2000 });
     }
     goToNext();
   };
@@ -426,18 +451,22 @@ const locations = [
   const handleSkipQuestion = () => {
     clearTimeout(questionTimeout.current);
     setShowQuestionModal(false);
-    toast.warning('Skipped', { duration: 2000 });
+    toast.warning("Skipped", { duration: 2000 });
     goToNext();
   };
-
   return (
     <>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <SafeAreaProvider>
           <View style={styles.container}>
+            {/* Score Display */}
+            <View style={styles.scoreContainer}>
+              <Text style={styles.scoreText}>Score: 🏆 {score}</Text>
+            </View>
+
             {/* Floating LGA Level */}
             <View style={styles.lgaContainer}>
-              <Text style={styles.lgaText}>{currentLGA}</Text>
+              <Text style={styles.lgaText}>{currentLGAWithLevel}</Text>
             </View>
 
             {/* Image/Video Area */}
@@ -450,6 +479,15 @@ const locations = [
                 />
               )}
             </View>
+
+            {/* Animated Hint Text */}
+            {showHint && (
+              <Animated.View
+                style={[hintPosition.getLayout(), styles.hintTextContainer]}
+              >
+                <Text style={styles.hintText}>{currentFact}</Text>
+              </Animated.View>
+            )}
 
             {/* Information Text */}
             <View style={styles.infoContainer}>
@@ -496,15 +534,6 @@ const locations = [
               <Text style={styles.hintButtonText}>Hint</Text>
             </TouchableOpacity>
 
-            {/* Animated Hint Text */}
-            {showHint && (
-              <Animated.View
-                style={[hintPosition.getLayout(), styles.hintTextContainer]}
-              >
-                <Text style={styles.hintText}>{currentFact}</Text>
-              </Animated.View>
-            )}
-
             {/* Question Modal */}
             <Modal
               visible={showQuestionModal}
@@ -519,7 +548,9 @@ const locations = [
                 <View style={styles.modalContainer}>
                   {currentQuestion && (
                     <>
-                      <Text style={styles.modalQuestion}>{currentQuestion.question}</Text>
+                      <Text style={styles.modalQuestion}>
+                        {currentQuestion.question}
+                      </Text>
                       {currentQuestion.options.map((option, index) => (
                         <TouchableOpacity
                           key={index}
@@ -644,13 +675,16 @@ const styles = StyleSheet.create({
   },
   hintTextContainer: {
     position: "absolute",
-    top: 50, // Initial drop position
+    top: "50%", // Center vertically
+    left: "10%",
+    right: "10%",
     backgroundColor: "rgba(255, 255, 255, 0.8)",
     padding: 15,
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "#ccc",
     zIndex: 9,
+    alignItems: "center", // Center text horizontally
   },
   hintText: {
     fontSize: 16,
