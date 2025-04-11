@@ -135,7 +135,7 @@ export default function App() {
     {
       lga: "Ukwa East",
       name: "Akwete Beach",
-      visual: require("./assets/placeholder-image.png"),
+      visual: require("./assets/beach.jpg"),
       fact: "A hidden gem offering a breathtaking coastal experience with traditional thatch huts for relaxation.",
       didYouKnow:
         "Provides a tranquil coastal getaway with local architectural charm.",
