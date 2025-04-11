@@ -183,7 +183,7 @@ export default function App() {
     {
       lga: "Umuahia North",
       name: "Ojukwu Bunker (Umuahia North)",
-      visual: require("./assets/placeholder-image.png"),
+      visual: require("./assets/bunker.jpg"),
       fact: "An underground bunker built in just 90 days, serving as a safe haven for General Odumegwu Ojukwu after the fall of Enugu during the Nigerian Civil War.",
       didYouKnow: "It had multiple exit routes, showcasing strategic planning.",
     },
