@@ -29,10 +29,217 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [gameEnded, setGameEnded] = useState(false);
   const [locationsVisited, setLocationsVisited] = useState(0);
-  const [showQuitModal, setShowQuitModal] = useState(false);  
+  const [showQuitModal, setShowQuitModal] = useState(false);
 
   const locations = [
-    // Your full locations data will go here
+    {
+      lga: "Isuikwuato",
+      name: "Isi-Uzu Waterfall",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "A powerful site of spiritual cleansing, known for granting fertility and reversing misfortunes. Guns are forbidden, and no one is ever allowed to fall there.",
+      didYouKnow: "Locals believe in its spiritual power to cleanse and bless.",
+    },
+    {
+      lga: "Isuikwuato",
+      name: "Iyi Uhia",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "A stunning stream nestled between rocky plains, perfect for swimming and melon washing.",
+      didYouKnow:
+        "This stream is appreciated for its natural beauty and recreational use, without specific spiritual ties.",
+    },
+    {
+      lga: "Isuikwuato",
+      name: "Okpu Chukwu",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "A once-sacred cave believed to have housed Chukwu Okike Abiama before he departed for Arochukwu. Served as a wartime refuge.",
+      didYouKnow:
+        "Features seven openings and a vast central chamber. Some say a tiger now calls it home.",
+    },
+    {
+      lga: "Isuikwuato",
+      name: "Nne-Oche River",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "A sacred river where no indigene dares to eat its fish, but outsiders may. Fish can only be hunted if they leave the water.",
+      didYouKnow:
+        "This tradition highlights a unique relationship between the local people and the river.",
+    },
+    {
+      lga: "Bende",
+      name: "Omenuko Building",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "Once a colonial office, this wooden structure served as a holding center for enslaved people before their transport to Arochukwu.",
+      didYouKnow:
+        "This site stands as a stark reminder of the transatlantic slave trade.",
+    },
+    {
+      lga: "Bende",
+      name: "The Armoury & Ulo Ishi Prison",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "More than just storage for colonial weapons, these sites witnessed brutal punishments of rebellious captives who were confined and flogged.",
+      didYouKnow:
+        "These locations echo with the pain and resilience of those who resisted colonial rule.",
+    },
+    {
+      lga: "Bende",
+      name: "Ulochukwu Cave",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "A divine wonder in Alayi, home to over 3,000 bats and a river flowing with both hot and cold water. Only the pure-hearted can enter without consequence.",
+      didYouKnow:
+        "The unique thermal properties of the river and the large bat population contribute to its mystique.",
+    },
+    {
+      lga: "Bende",
+      name: "The Sacred Oba Tree of Ukwueke",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "A powerful symbol of justice, untouched by outsiders. It is believed that no true indigene of Ukwueke dies by accident.",
+      didYouKnow:
+        "This tree holds deep cultural significance and is revered by the local community.",
+    },
+    {
+      lga: "Bende",
+      name: "Ojukwu’s Bunker (Methodist College)",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "A hidden Civil War stronghold where General Ojukwu stored ammunition and strategized.",
+      didYouKnow:
+        "This bunker serves as a historical landmark of the Nigerian Civil War.",
+    },
+    {
+      lga: "Bende",
+      name: "Akoli Imenyi",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "A tranquil escape into nature, with rustic palm-frond lodges, a natural fish pond, and a live turtle—a perfect retreat for serenity seekers.",
+      didYouKnow: "Offers a peaceful environment to connect with nature.",
+    },
+    {
+      lga: "Ukwa East",
+      name: "Azumili Blue River (Nne Obu)",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "Famous for its mesmerizing blue hue, which transforms into a vibrant green during the rainy season.",
+      didYouKnow: "A true marvel of nature showcasing seasonal color changes.",
+    },
+    {
+      lga: "Ukwa East",
+      name: "Obeka Blue River",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "Serves as a natural boundary between Abia State and Akwa Ibom, offering visitors a scenic and serene view.",
+      didYouKnow: "Its blue waters provide a picturesque natural border.",
+    },
+    {
+      lga: "Ukwa East",
+      name: "Owo Okoato Ohanbela",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "Home to a legendary mango tree where enslaved people once made their final wishes before being taken away. King Jaja of Opobo was also captured here.",
+      didYouKnow:
+        "This historic site bears witness to both the slave trade and the capture of a significant historical figure.",
+    },
+    {
+      lga: "Ukwa East",
+      name: "Akwete Beach",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "A hidden gem offering a breathtaking coastal experience with traditional thatch huts for relaxation.",
+      didYouKnow:
+        "Provides a tranquil coastal getaway with local architectural charm.",
+    },
+    {
+      lga: "Ukwa East",
+      name: "Akwete Weaving Institute",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "Unveils the intricate process of weaving the unique Akwete fabric, a proud symbol of Abia’s cultural heritage.",
+      didYouKnow:
+        "The craft empowers young girls in Akwete, preserving a centuries-old tradition.",
+    },
+    {
+      lga: "Umuahia North",
+      name: "Iyi Ama",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "A female river that diminished in size after the sacred crocodile dwelling within it was killed. Fishing is strictly prohibited.",
+      didYouKnow:
+        "Its source emerges from a stone, and it remains a revered site.",
+    },
+    {
+      lga: "Umuahia North",
+      name: "Iyi Ocha Umuagu",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "A sacred meeting point where three rivers from three different villages converge. Villagers sought refuge here during the war. Fishing is forbidden at their confluence.",
+      didYouKnow:
+        "While fishing is permitted in the individual rivers, the meeting point is considered sacred.",
+    },
+    {
+      lga: "Umuahia North",
+      name: "Iyi Umuchima",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "A breathtaking river deeply intertwined with the Ekpe tradition. Only inducted members are allowed near its waters during sacred rites.",
+      didYouKnow:
+        "Women and uninitiated men are strictly prohibited from approaching this site during these times.",
+    },
+    {
+      lga: "Umuahia North",
+      name: "Nwagbara Agomuo’s Compound",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "Tells the story of the first warrant chief in Ibeku, who played a significant role in the transatlantic slave trade. Home to the first storey building in Umuahia.",
+      didYouKnow:
+        "The first storey building was constructed by the British colonial government.",
+    },
+    {
+      lga: "Umuahia North",
+      name: "Ojukwu Bunker (Umuahia North)",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "An underground bunker built in just 90 days, serving as a safe haven for General Odumegwu Ojukwu after the fall of Enugu during the Nigerian Civil War.",
+      didYouKnow: "It had multiple exit routes, showcasing strategic planning.",
+    },
+    {
+      lga: "Umuahia North",
+      name: "National War Museum",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "Houses an extensive collection of ammunition and equipment used during the Nigeria-Biafra War.",
+      didYouKnow:
+        "One of the escape tunnels from Ojukwu’s bunker leads directly to the museum.",
+    },
+    {
+      lga: "Ikwuano",
+      name: "Ntugbo Oloko Magistrate and Customary Court",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "The first court built in the entire Southeast region, bearing witness to the Aba Women’s Riot of 1929 where brave women stood against colonial oppression.",
+      didYouKnow:
+        "Many of the women involved in the Aba Women’s Riot were tried here.",
+    },
+    {
+      lga: "Umunneochie",
+      name: "Iyi Aja in Umuobasi Mbala",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "A mysterious river filled with sand. It is not the water but the sand that sinks people and then throws them back up.",
+      didYouKnow: "This unusual phenomenon adds to the river's intrigue.",
+    },
+    {
+      lga: "Umunneochie",
+      name: "Nwokoro Ukwu (Giant of Alakuku) in Mbala Isiochi",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "The tallest man in Africa, standing at 11.6 feet tall. Born in the 1920s and passed in 1958.",
+      didYouKnow:
+        "He never married but left behind a star fruit tree in his compound, still thriving today. His grave in Okigwe is uniquely chained.",
+    },
+    {
+      lga: "Umunneochie",
+      name: "Nkoro Cave in Akporo Achara Isiochi",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "A breathtaking natural wonder discovered by Nnanyi Okorie, featuring a stunning passage of water.",
+      didYouKnow:
+        "The water passage inside the cave makes it a remarkable sight.",
+    },
+    {
+      lga: "Umunneochie",
+      name: "Iyi Okoro Aho in Amuda Isiochi",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "A waterfall discovered by ancient hunters in search of water. It has a separate spring water source that locals drink from to this day.",
+      didYouKnow: "The spring water source adds to its local significance.",
+    },
+    {
+      lga: "Umunneochie",
+      name: "Isi Imo in Umuako Isiochi",
+      visual: require("./assets/placeholder-image.png"),
+      fact: "Believed to be the origin of the Imo River. A three-day festival is held in its honor every February.",
+      didYouKnow: "The river is also renowned for its healing properties.",
+    },
   ];
 
   const totalLocations = locations.length;
@@ -46,7 +253,7 @@ export default function App() {
   useEffect(() => {
     setTimeout(() => {
       setIsLoading(false);
-    }, 5000); // Increased loading time for video to potentially load
+    }, 5000);
   }, []);
 
   useEffect(() => {
@@ -73,7 +280,7 @@ export default function App() {
     return (
       <View style={styles.fullScreen}>
         <Video
-          source={require("./assets/splash_video.mp4")} // Replace with your video path
+          source={require("./assets/splash_video.mp4")}
           style={styles.fullScreen}
           muted={true}
           repeat={true}
