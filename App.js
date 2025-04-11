@@ -50,7 +50,7 @@ export default function App() {
     {
       lga: "Isuikwuato",
       name: "Okpu Chukwu",
-      visual: require("./assets/placeholder-image.png"),
+      visual: require("./assets/okpuchukwu.jpg"),
       fact: "A once-sacred cave believed to have housed Chukwu Okike Abiama before he departed for Arochukwu. Served as a wartime refuge.",
       didYouKnow:
         "Features seven openings and a vast central chamber. Some say a tiger now calls it home.",
