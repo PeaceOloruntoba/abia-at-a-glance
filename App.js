@@ -198,7 +198,7 @@ export default function App() {
     {
       lga: "Ikwuano",
       name: "Ntugbo Oloko Magistrate and Customary Court",
-      visual: require("./assets/placeholder-image.png"),
+      visual: require("./assets/court.jpg"),
       fact: "The first court built in the entire Southeast region, bearing witness to the Aba Women’s Riot of 1929 where brave women stood against colonial oppression.",
       didYouKnow:
         "Many of the women involved in the Aba Women’s Riot were tried here.",
