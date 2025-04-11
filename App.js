@@ -42,7 +42,7 @@ export default function App() {
     {
       lga: "Isuikwuato",
       name: "Iyi Uhia",
-      visual: require("./assets/placeholder-image.png"),
+      visual: require("./assets/iyiuhia.jpg"),
       fact: "A stunning stream nestled between rocky plains, perfect for swimming and melon washing.",
       didYouKnow:
         "This stream is appreciated for its natural beauty and recreational use, without specific spiritual ties.",
