@@ -35,7 +35,7 @@ export default function App() {
     {
       lga: "Isuikwuato",
       name: "Isi-Uzu Waterfall",
-      visual: require("./assets/placeholder-image.png"),
+      visual: require("./assets/isiuzu.jpg"),
       fact: "A powerful site of spiritual cleansing, known for granting fertility and reversing misfortunes. Guns are forbidden, and no one is ever allowed to fall there.",
       didYouKnow: "Locals believe in its spiritual power to cleanse and bless.",
     },
