@@ -106,7 +106,7 @@ export default function App() {
     {
       lga: "Bende",
       name: "Akoli Imenyi",
-      visual: require("./assets/placeholder-image.png"),
+      visual: require("./assets/akoli.jpg"),
       fact: "A tranquil escape into nature, with rustic palm-frond lodges, a natural fish pond, and a live turtle—a perfect retreat for serenity seekers.",
       didYouKnow: "Offers a peaceful environment to connect with nature.",
     },
