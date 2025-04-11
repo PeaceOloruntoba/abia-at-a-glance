@@ -190,7 +190,7 @@ export default function App() {
     {
       lga: "Umuahia North",
       name: "National War Museum",
-      visual: require("./assets/placeholder-image.png"),
+      visual: require("./assets/warm.jpg"),
       fact: "Houses an extensive collection of ammunition and equipment used during the Nigeria-Biafra War.",
       didYouKnow:
         "One of the escape tunnels from Ojukwu’s bunker leads directly to the museum.",
