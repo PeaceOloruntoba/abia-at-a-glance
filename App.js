@@ -25,6 +25,9 @@ export default function App() {
   const questionTimeout = useRef(null);
   const lgaLevels = ["Level 🌟", "Level 🏞️", "Level 🗺️", "Level 📍"];
   const [lgaLevelIndex, setLgaLevelIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [gameEnded, setGameEnded] = useState(false);
+  const [locationsVisited, setLocationsVisited] = useState(0);
 
 const locations = [
   // Isuikwuato Local Government
@@ -248,12 +251,19 @@ const locations = [
   },
 ];
 
+  const totalLocations = locations.length;
   const currentLGA = locations[currentLocationIndex]?.lga || "";
   const currentItemName = locations[currentLocationIndex]?.name || "";
   const currentFact = locations[currentLocationIndex]?.fact || "";
   const currentDidYouKnow = locations[currentLocationIndex]?.didYouKnow || "";
   const currentVisual = locations[currentLocationIndex]?.visual;
   const currentLGAWithLevel = `${lgaLevels[lgaLevelIndex]} - ${currentLGA}`;
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 3000); // Simulate 3 seconds of loading
+  }, []);
 
   useEffect(() => {
     const nextIndex = (lgaLevelIndex + 1) % lgaLevels.length;
@@ -264,9 +274,7 @@ const locations = [
     const possibleQuestions = [
       `What Local Government Area is ${currentItemName} located in?`,
       `According to the fact, what is a notable feature of ${currentItemName}?`,
-      currentDidYouKnow
-        ? `True or False: ${currentDidYouKnow}`
-        : `True or False: There's something interesting about ${currentItemName}.`,
+      currentDidYouKnow ? `True or False: ${currentDidYouKnow}` : `True or False: There's something interesting about ${currentItemName}.`,
     ];
     const randomIndex = Math.floor(Math.random() * possibleQuestions.length);
     const question = possibleQuestions[randomIndex];
@@ -279,31 +287,17 @@ const locations = [
       const otherLGAs = [...new Set(locations.map((loc) => loc.lga))].filter(
         (lga) => lga !== currentLGA
       );
-      const incorrectLGA1 =
-        otherLGAs[Math.floor(Math.random() * otherLGAs.length)] ||
-        "Unknown LGA";
-      const incorrectLGA2 =
-        otherLGAs.filter((lga) => lga !== incorrectLGA1)[
-          Math.floor(Math.random() * (otherLGAs.length - 1))
-        ] || "Another Unknown LGA";
-      options = [correctAnswer, incorrectLGA1, incorrectLGA2].sort(
-        () => Math.random() - 0.5
-      );
+      const incorrectLGA1 = otherLGAs[Math.floor(Math.random() * otherLGAs.length)] || "Unknown LGA";
+      const incorrectLGA2 = otherLGAs.filter(lga => lga !== incorrectLGA1)[Math.floor(Math.random() * (otherLGAs.length - 1))] || "Another Unknown LGA";
+      options = [correctAnswer, incorrectLGA1, incorrectLGA2].sort(() => Math.random() - 0.5);
     } else if (question.includes("notable feature")) {
       correctAnswer = currentFact.split(".")[0];
       const otherFacts = locations
         .filter((loc) => loc.fact !== currentFact)
         .map((loc) => loc.fact.split(".")[0]);
-      const incorrectFact1 =
-        otherFacts[Math.floor(Math.random() * otherFacts.length)] ||
-        "Interesting detail";
-      const incorrectFact2 =
-        otherFacts.filter((fact) => fact !== incorrectFact1)[
-          Math.floor(Math.random() * (otherFacts.length - 1))
-        ] || "Another detail";
-      options = [correctAnswer, incorrectFact1, incorrectFact2].sort(
-        () => Math.random() - 0.5
-      );
+      const incorrectFact1 = otherFacts[Math.floor(Math.random() * otherFacts.length)] || "Interesting detail";
+      const incorrectFact2 = otherFacts.filter(fact => fact !== incorrectFact1)[Math.floor(Math.random() * (otherFacts.length - 1))] || "Another detail";
+      options = [correctAnswer, incorrectFact1, incorrectFact2].sort(() => Math.random() - 0.5);
     } else if (question.includes("True or False")) {
       correctAnswer = currentDidYouKnow ? "True" : "True"; // Assuming 'Did You Know' is always true for the question
       options = ["True", "False"].sort(() => Math.random() - 0.5);
@@ -330,9 +324,7 @@ const locations = [
 
   const goToNext = () => {
     const nextIndex =
-      currentLocationIndex < locations.length - 1
-        ? currentLocationIndex + 1
-        : 0;
+      currentLocationIndex < locations.length - 1 ? currentLocationIndex + 1 : 0;
     const nextLGA = locations[nextIndex]?.lga || "";
     if (nextLGA !== currentLGA) {
       toast.success(`Moving to ${nextLGA} LGA`, { type: "success" });
@@ -344,6 +336,7 @@ const locations = [
     startInitialTimer();
     setShowQuestionModal(false);
     clearTimeout(questionTimeout.current);
+    setLocationsVisited((prevCount) => prevCount + 1);
   };
 
   const handleDidYouKnowPress = () => {
@@ -385,6 +378,12 @@ const locations = [
   useEffect(() => {
     startInitialTimer();
   }, []);
+
+  useEffect(() => {
+    if (locationsVisited > totalLocations && totalLocations > 0) {
+      setGameEnded(true);
+    }
+  }, [locationsVisited, totalLocations]);
 
   const handleHintPress = () => {
     setShowHint(true);
@@ -440,10 +439,10 @@ const locations = [
     setShowQuestionModal(false);
     if (selectedAnswer === currentQuestion.correctAnswer) {
       setScore((prevScore) => prevScore + 5);
-      toast.success("Correct! +5 points", { duration: 2000 });
+      toast.success('Correct! +5 points', { duration: 2000 });
     } else {
       setScore((prevScore) => prevScore - 2);
-      toast.error("Wrong! -2 points", { duration: 2000 });
+      toast.error('Wrong! -2 points', { duration: 2000 });
     }
     goToNext();
   };
@@ -451,9 +450,37 @@ const locations = [
   const handleSkipQuestion = () => {
     clearTimeout(questionTimeout.current);
     setShowQuestionModal(false);
-    toast.warning("Skipped", { duration: 2000 });
+    toast.warning('Skipped', { duration: 2000 });
     goToNext();
   };
+
+  if (isLoading) {
+    return (
+      <View style={styles.splashScreen}>
+        <Text style={styles.splashText}>Abia at a Glance 🌟</Text>
+        {/* You can add a loading indicator or image here */}
+      </View>
+    );
+  }
+
+  if (gameEnded) {
+    return (
+      <View style={styles.endScreen}>
+        <Text style={styles.endText}>Game Over! 🎉</Text>
+        <Text style={styles.finalScore}>Your Final Score: 🏆 {score}</Text>
+        <TouchableOpacity style={styles.restartButton} onPress={() => {
+          setGameEnded(false);
+          setLocationsVisited(0);
+          setCurrentLocationIndex(0);
+          setScore(0);
+          startInitialTimer();
+        }}>
+          <Text style={styles.restartButtonText}>Restart 🔄</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <>
       <GestureHandlerRootView style={{ flex: 1 }}>
@@ -482,8 +509,7 @@ const locations = [
 
             {/* Animated Hint Text */}
             {showHint && (
-              <Animated.View
-                style={[hintPosition.getLayout(), styles.hintTextContainer]}
+              <Animated.View style={[hintPosition.getLayout(), styles.hintTextContainer]}
               >
                 <Text style={styles.hintText}>{currentFact}</Text>
               </Animated.View>
@@ -519,10 +545,10 @@ const locations = [
             {/* Navigation Buttons */}
             <View style={styles.navigationContainer}>
               <TouchableOpacity style={styles.navButton} onPress={goToPrevious}>
-                <Text>Previous</Text>
+                <Text style={styles.navButtonText}>⬅️ Previous</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.navButton} onPress={goToNext}>
-                <Text>Next</Text>
+                <Text style={styles.navButtonText}>Next ➡️</Text>
               </TouchableOpacity>
             </View>
 
@@ -548,9 +574,7 @@ const locations = [
                 <View style={styles.modalContainer}>
                   {currentQuestion && (
                     <>
-                      <Text style={styles.modalQuestion}>
-                        {currentQuestion.question}
-                      </Text>
+                      <Text style={styles.modalQuestion}>{currentQuestion.question}</Text>
                       {currentQuestion.options.map((option, index) => (
                         <TouchableOpacity
                           key={index}
@@ -643,15 +667,23 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   navigationContainer: {
-    flexDirection: "row",
-    width: "100%",
-    justifyContent: "space-around",
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-around',
     marginTop: 20,
+    paddingHorizontal: 20,
   },
   navButton: {
-    backgroundColor: "#ddd",
-    padding: 10,
-    borderRadius: 5,
+    backgroundColor: '#64b5f6', // A light blue
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    elevation: 3, // Add a slight shadow
+  },
+  navButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   countdown: {
     fontSize: 20,
@@ -674,17 +706,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   hintTextContainer: {
-    position: "absolute",
-    top: "50%", // Center vertically
-    left: "10%",
-    right: "10%",
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    position: 'absolute',
+    top: '50%', // Center vertically
+    left: '10%',
+    right: '10%',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     padding: 15,
     borderRadius: 5,
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: '#ccc',
     zIndex: 9,
-    alignItems: "center", // Center text horizontally
+    alignItems: 'center', // Center text horizontally
   },
   hintText: {
     fontSize: 16,
@@ -732,18 +764,58 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   scoreContainer: {
-    position: "absolute",
+    position: 'absolute',
     top: 60, // Adjust as needed
     right: 20,
-    backgroundColor: "rgba(0, 128, 0, 0.7)",
+    backgroundColor: 'rgba(0, 128, 0, 0.7)',
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 8,
     zIndex: 11,
   },
   scoreText: {
-    color: "white",
-    fontWeight: "bold",
+    color: 'white',
+    fontWeight: 'bold',
     fontSize: 16,
+  },
+  splashScreen: {
+    flex: 1,
+    backgroundColor: '#81c784', // A nice green
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  splashText: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  endScreen: {
+    flex: 1,
+    backgroundColor: '#fdd835', // A cheerful yellow
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  endText: {
+    fontSize: 40,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  finalScore: {
+    fontSize: 24,
+    color: '#333',
+    marginBottom: 30,
+  },
+  restartButton: {
+    backgroundColor: '#1e88e5', // A bright blue
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 10,
+  },
+  restartButtonText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
   },
 });
