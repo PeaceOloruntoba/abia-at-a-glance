@@ -66,7 +66,7 @@ export default function App() {
     {
       lga: "Bende",
       name: "Omenuko Building",
-      visual: require("./assets/placeholder-image.png"),
+      visual: require("./assets/omenuko.jpg"),
       fact: "Once a colonial office, this wooden structure served as a holding center for enslaved people before their transport to Arochukwu.",
       didYouKnow:
         "This site stands as a stark reminder of the transatlantic slave trade.",
