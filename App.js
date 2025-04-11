@@ -11,7 +11,7 @@ import {
 import { toast, Toaster } from "sonner-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import Video from "react-native-video"; // Import the video component
+import { Video } from "expo-video";
 
 export default function App() {
   const [currentLocationIndex, setCurrentLocationIndex] = useState(0);
@@ -306,7 +306,7 @@ export default function App() {
         () => Math.random() - 0.5
       );
     } else if (question.includes("True or False")) {
-      correctAnswer = currentDidYouKnow ? "True" : "True"; // Assuming 'Did You Know' is always true for the question
+      correctAnswer = currentDidYouKnow ? "True" : "True";
       options = ["True", "False"].sort(() => Math.random() - 0.5);
     }
 
@@ -439,8 +439,8 @@ export default function App() {
     questionTimeout.current = setTimeout(() => {
       setShowQuestionModal(false);
       toast.error("Time's up!", { duration: 2000 });
-      goToNext(); // Move to the next item on timeout
-    }, 10000);
+      goToNext();
+    }, 15000);
   };
 
   const handleAnswer = (selectedAnswer) => {
@@ -482,9 +482,11 @@ export default function App() {
         <Video
           source={require("./assets/splash_video.mp4")}
           style={styles.fullScreen}
-          muted={true}
-          repeat={true}
+          isMuted={true}
+          shouldPlay
+          isLooping
           resizeMode="cover"
+          onError={(error) => console.error("Video Error (Splash):", error)}
         />
         <View style={styles.splashContent}>
           <Text style={styles.splashTitle}>Abia at a Glance 🌟</Text>
@@ -505,11 +507,13 @@ export default function App() {
     return (
       <View style={styles.fullScreen}>
         <Video
-          source={require("./assets/end_video.mp4")} // Replace with your video path
+          source={require("./assets/end_video.mp4")}
           style={styles.fullScreen}
-          muted={true}
-          repeat={true}
+          isMuted={true}
+          shouldPlay
+          isLooping
           resizeMode="cover"
+          onError={(error) => console.error("Video Error (End):", error)}
         />
         <View style={styles.endContent}>
           <Text style={styles.endTitle}>That's all for now! 🎉</Text>
@@ -708,7 +712,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 40,
-    backgroundColor: "rgba(0,0,0,0.5)", // Semi-transparent overlay for text
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   splashTitle: {
     fontSize: 48,
