@@ -213,7 +213,7 @@ export default function App() {
     {
       lga: "Umunneochie",
       name: "Nwokoro Ukwu (Giant of Alakuku) in Mbala Isiochi",
-      visual: require("./assets/placeholder-image.png"),
+      visual: require("./assets/tallest.png"),
       fact: "The tallest man in Africa, standing at 11.6 feet tall. Born in the 1920s and passed in 1958.",
       didYouKnow:
         "He never married but left behind a star fruit tree in his compound, still thriving today. His grave in Okigwe is uniquely chained.",
